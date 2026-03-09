@@ -1,0 +1,28 @@
+.card {
+  cursor: pointer;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  user-select: none;
+}
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.iconName { display: flex; align-items: flex-start; gap: 0.75rem; }
+.icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.name { font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 4px; }
+.catBadge { font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+.checkbox {
+  width: 20px; height: 20px; border-radius: 4px;
+  border: 1.5px solid var(--border-bright);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 11px; flex-shrink: 0;
+  transition: all var(--transition); margin-top: 2px;
+}
+.checkbox.checked { background: var(--accent); border-color: var(--accent); }
+.description { font-size: 12px; color: var(--text-secondary); line-height: 1.5; flex: 1; }
+.prereq { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.prereqLabel { font-size: 11px; color: var(--text-muted); }
+.prereqTag { font-size: 11px; }
+.versionRow { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem; }
+.versionLabel { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }

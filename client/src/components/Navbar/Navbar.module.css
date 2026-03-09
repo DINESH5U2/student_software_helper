@@ -1,0 +1,49 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(11, 14, 20, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+.brandIcon { font-size: 1.3rem; color: var(--accent); }
+.brandText { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+.brandAccent { color: var(--accent); }
+.links { display: flex; align-items: center; gap: 0.5rem; }
+.link {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: color var(--transition), background var(--transition);
+}
+.link:hover { color: var(--text-primary); background: var(--bg-card); }
+.link.active { color: var(--accent); }
+.ctaBtn {
+  text-decoration: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  margin-left: 0.5rem;
+  transition: all var(--transition);
+}
+.ctaBtn:hover { background: var(--accent-hover); box-shadow: 0 4px 16px var(--accent-glow); color: #fff; }

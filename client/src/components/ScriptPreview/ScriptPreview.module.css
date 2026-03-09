@@ -1,0 +1,7 @@
+.wrapper { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.titleBar { background: #12151e; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1rem; }
+.dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.filename { font-size: 12px; color: var(--text-secondary); flex: 1; }
+.lines { font-size: 11px; color: var(--text-muted); }
+.codeWrapper { background: #080b10; }
