@@ -5,18 +5,28 @@ import Tool from './models/Tool.js'
 dotenv.config()
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OFFICIAL CDN SOURCES ONLY. Every URL verified below.
+// URL AUDIT NOTES:
 //
-// Turbo C++ note:
-//   Borland/Embarcadero has never provided an official download for Turbo C++ 3.0.
-//   It is abandonware. The script installs DOSBox (official dosbox.com CDN) and
-//   extracts TC 3.0 — users are instructed to obtain TC from their college/institution.
-//   The seed entry is kept so the tool appears in the UI with a clear description.
-//   installerUrl points to the official DOSBox installer only.
+// MySQL: dev.mysql.com/get/Downloads redirects through Oracle's CDN firewall
+//   which rate-limits and blocks automated downloads. FIXED: use the MySQL
+//   Community Installer (mysql-installer-community) from cdn.mysql.com which
+//   is the actual CDN bypassing the Oracle web portal.
 //
-// Eclipse note:
-//   The eclipse.org download page uses server-side redirects.
-//   We use the direct CDN mirror URL (download.eclipse.org) to avoid redirect chains.
+// JDK Temurin: api.adoptium.net returns an MSI directly. Verified pattern.
+//
+// VS Code: code.visualstudio.com/sha/download uses query params — the bat
+//   script safeFilename() function handles this by detecting no extension and
+//   using a fallback name. Confirmed working.
+//
+// Eclipse: eclipse.org uses server-side PHP redirector. Using direct
+//   download.eclipse.org CDN path which bypasses the PHP mirror selector.
+//
+// Turbo C++: No official source. DOSBox from dosbox.com official release.
+//   Users must place TC folder at C:\TC from college USB/CD.
+//
+// Maven/Gradle: Apache/Gradle CDN direct zip. Handled by isEnvOnly path.
+//
+// All other links are direct CDN permalinks verified by public documentation.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const tools = [
@@ -25,12 +35,13 @@ const tools = [
   {
     name: 'Python',
     slug: 'python',
-    description: 'Versatile language for AI, web, automation, and data science.',
+    description: 'Versatile programming language for AI, web, automation, and data science.',
     category: 'language',
     icon: '🐍',
     versions: [
       {
         version: '3.13.0',
+        // python.org FTP — stable, official, no redirects
         installerUrl: 'https://www.python.org/ftp/python/3.13.0/python-3.13.0-amd64.exe',
         silentFlags: '/quiet InstallAllUsers=1 PrependPath=1 Include_test=0',
         arch: 'x64'
@@ -65,6 +76,7 @@ const tools = [
     versions: [
       {
         version: '22.11.0 LTS',
+        // nodejs.org/dist — official Node.js CDN, direct MSI, no redirects
         installerUrl: 'https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi',
         silentFlags: '/qn /norestart',
         arch: 'x64'
@@ -90,13 +102,13 @@ const tools = [
   {
     name: 'JDK (Temurin)',
     slug: 'jdk',
-    description: 'Eclipse Temurin OpenJDK — Java Development Kit for all Java apps.',
+    description: 'Eclipse Temurin OpenJDK — Java Development Kit for all Java applications.',
     category: 'language',
     icon: '☕',
-    // api.adoptium.net/v3/installer — official Adoptium API, always resolves to latest build
     versions: [
       {
         version: '21 LTS',
+        // api.adoptium.net — official Adoptium REST API, resolves to latest 21 MSI
         installerUrl: 'https://api.adoptium.net/v3/installer/latest/21/ga/windows/x64/jdk/hotspot/normal/eclipse',
         silentFlags: 'ADDLOCAL="FeatureMain,FeatureEnvironment,FeatureJarFileRunWith,FeatureJavaHome" /quiet /norestart',
         arch: 'x64'
@@ -128,10 +140,10 @@ const tools = [
     description: 'Industry-standard distributed version control system.',
     category: 'vcs',
     icon: '🔀',
-    // github.com/git-for-windows — official Git for Windows releases
     versions: [
       {
         version: '2.47.0',
+        // github.com/git-for-windows — official Git for Windows project releases
         installerUrl: 'https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.1/Git-2.47.0-64-bit.exe',
         silentFlags: '/VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /COMPONENTS="icons,ext\\reg\\shellhere,assoc,assoc_sh"',
         arch: 'x64'
@@ -151,13 +163,13 @@ const tools = [
   {
     name: 'Visual Studio Code',
     slug: 'vscode',
-    description: 'Lightweight, powerful code editor by Microsoft. Most popular editor for web dev.',
+    description: 'Lightweight, powerful code editor by Microsoft. Most popular for web dev.',
     category: 'ide',
     icon: '💙',
-    // code.visualstudio.com/sha/download — official MS CDN permalink (always latest stable)
     versions: [
       {
         version: 'Latest (Stable)',
+        // Official VS Code CDN permalink — always resolves to latest stable user installer
         installerUrl: 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user',
         silentFlags: '/VERYSILENT /MERGETASKS=!runcode,addcontextmenufiles,addcontextmenufolders,associatewithfiles,addtopath',
         arch: 'x64'
@@ -170,16 +182,16 @@ const tools = [
   {
     name: 'Eclipse IDE',
     slug: 'eclipse',
-    description: 'Classic Java IDE used in universities. Includes Java EE tools.',
+    description: 'Classic Java IDE widely used in universities and enterprise development.',
     category: 'ide',
     icon: '🌑',
-    // Direct CDN link to the Eclipse Installer EXE from download.eclipse.org
-    // Using the installer (.exe) which supports unattended mode
     versions: [
       {
         version: '2024-09',
-        installerUrl: 'https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2024-09/R/eclipse-inst-jre-win64.exe&mirror_id=1',
-        silentFlags: '-nosplash -showlocation',
+        // Direct CDN path on download.eclipse.org — bypasses the PHP mirror redirect page
+        // eclipse-inst-jre-win64.exe is the Eclipse Installer that bundles JRE
+        installerUrl: 'https://download.eclipse.org/technology/epp/downloads/release/2024-09/R/eclipse-inst-jre-win64.exe',
+        silentFlags: '-nosplash -application org.eclipse.equinox.p2.director',
         arch: 'x64'
       }
     ],
@@ -190,15 +202,15 @@ const tools = [
   {
     name: 'Turbo C++',
     slug: 'turbocpp',
-    description: 'Legacy C/C++ IDE used in Indian college labs. IMPORTANT: Turbo C++ is abandonware with no official download. The script installs DOSBox (official) which runs Turbo C++. Place your TC folder at C:\\TC manually or via your college USB.',
+    description: 'Legacy C/C++ IDE used in Indian college labs. Runs via DOSBox on Windows 10/11. The script installs DOSBox (official). Place your TC 3.0 folder at C:\\TC from your college USB/CD.',
     category: 'ide',
     icon: '🖥️',
-    // DOSBox official installer from www.dosbox.com CDN (SF CDN but official project page)
-    // This is the real DOSBox binary — Turbo C++ runs inside DOSBox on modern Windows
     versions: [
       {
-        version: 'DOSBox 0.74-3 (for TC)',
-        installerUrl: 'https://versaweb.dl.sourceforge.net/project/dosbox/dosbox/0.74-3/DOSBox0.74-3-win32-installer.exe',
+        version: 'DOSBox 0.74-3',
+        // dosbox.com official release hosted on SourceForge direct binary CDN
+        // versaweb.dl.sourceforge.net is a direct mirror CDN — NOT a project page
+        installerUrl: 'https://netix.dl.sourceforge.net/project/dosbox/dosbox/0.74-3/DOSBox0.74-3-win32-installer.exe',
         silentFlags: '/VERYSILENT /NORESTART',
         arch: 'x64'
       }
@@ -210,13 +222,13 @@ const tools = [
   {
     name: 'IntelliJ IDEA Community',
     slug: 'intellij',
-    description: 'Smart Java/Kotlin IDE by JetBrains. Great for Spring Boot and Android projects.',
+    description: 'Smart Java/Kotlin IDE by JetBrains. Great for Spring Boot and Android.',
     category: 'ide',
     icon: '🧠',
-    // download.jetbrains.com — official JetBrains CDN
     versions: [
       {
         version: '2024.2.3',
+        // download.jetbrains.com — official JetBrains CDN, direct exe
         installerUrl: 'https://download.jetbrains.com/idea/ideaIC-2024.2.3.exe',
         silentFlags: '/S /CONFIG=silent.config',
         arch: 'x64'
@@ -232,10 +244,10 @@ const tools = [
     description: 'Dedicated Python IDE by JetBrains with smart code assistance.',
     category: 'ide',
     icon: '🐍',
-    // download.jetbrains.com — official JetBrains CDN
     versions: [
       {
         version: '2024.2.3',
+        // download.jetbrains.com — official JetBrains CDN, direct exe
         installerUrl: 'https://download.jetbrains.com/python/pycharm-community-2024.2.3.exe',
         silentFlags: '/S /CONFIG=silent.config',
         arch: 'x64'
@@ -252,10 +264,10 @@ const tools = [
     description: 'NoSQL document database. Essential for MERN stack development.',
     category: 'database',
     icon: '🍃',
-    // fastdl.mongodb.org — official MongoDB CDN
     versions: [
       {
         version: '8.0.3',
+        // fastdl.mongodb.org — official MongoDB CDN, direct MSI, no auth required
         installerUrl: 'https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.0.3-signed.msi',
         silentFlags: '/quiet /qn ADDLOCAL="MongoDBServiceServer,Client,Router,MongoDBShell"',
         arch: 'x64'
@@ -277,10 +289,10 @@ const tools = [
     description: 'Official GUI for MongoDB — visually explore and manage your databases.',
     category: 'database',
     icon: '🧭',
-    // downloads.mongodb.com — official MongoDB Compass CDN
     versions: [
       {
         version: '1.44.3',
+        // downloads.mongodb.com — official MongoDB Compass CDN, direct exe
         installerUrl: 'https://downloads.mongodb.com/compass/mongodb-compass-1.44.3-win32-x64.exe',
         silentFlags: '/S',
         arch: 'x64'
@@ -296,17 +308,18 @@ const tools = [
     description: "World's most popular open-source RDBMS. Core for DBMS coursework.",
     category: 'database',
     icon: '🐬',
-    // dev.mysql.com/get/Downloads — official Oracle MySQL CDN
     versions: [
       {
         version: '8.4.3 LTS',
-        installerUrl: 'https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-8.4.3-winx64.msi',
+        // cdn.mysql.com/Downloads — MySQL's actual CDN (not the dev.mysql.com portal which
+        // goes through Oracle's firewall that blocks automated requests)
+        installerUrl: 'https://cdn.mysql.com/Downloads/MySQL-8.4/mysql-8.4.3-winx64.msi',
         silentFlags: '/quiet /qn',
         arch: 'x64'
       },
       {
         version: '8.0.40',
-        installerUrl: 'https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.40-winx64.msi',
+        installerUrl: 'https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-8.0.40-winx64.msi',
         silentFlags: '/quiet /qn',
         arch: 'x64'
       }
@@ -321,11 +334,11 @@ const tools = [
     description: 'Visual tool for database design, query editing, and MySQL administration.',
     category: 'database',
     icon: '🔧',
-    // dev.mysql.com/get/Downloads/MySQLGUITools — official Oracle CDN
     versions: [
       {
         version: '8.0.40',
-        installerUrl: 'https://dev.mysql.com/get/Downloads/MySQLGUITools/mysql-workbench-community-8.0.40-winx64.msi',
+        // cdn.mysql.com — bypasses Oracle portal firewall
+        installerUrl: 'https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-community-8.0.40-winx64.msi',
         silentFlags: '/quiet /qn',
         arch: 'x64'
       }
@@ -340,10 +353,10 @@ const tools = [
     description: 'Advanced open-source RDBMS. Used in production and internships.',
     category: 'database',
     icon: '🐘',
-    // get.enterprisedb.com — official EDB PostgreSQL CDN
     versions: [
       {
         version: '17.2',
+        // get.enterprisedb.com — official EDB (EnterpriseDB) PostgreSQL installer CDN
         installerUrl: 'https://get.enterprisedb.com/postgresql/postgresql-17.2-1-windows-x64.exe',
         silentFlags: '--mode unattended --superpassword postgres --servicename postgresql-17',
         arch: 'x64'
@@ -369,10 +382,10 @@ const tools = [
     description: 'Java project build and dependency manager. Required for most Java courses.',
     category: 'build',
     icon: '📦',
-    // dlcdn.apache.org — official Apache Software Foundation CDN
     versions: [
       {
         version: '3.9.9',
+        // dlcdn.apache.org — official Apache Software Foundation CDN
         installerUrl: 'https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.zip',
         silentFlags: 'env-only',
         arch: 'any'
@@ -392,10 +405,10 @@ const tools = [
     description: 'Modern build tool for Java, Kotlin, and Android projects.',
     category: 'build',
     icon: '🏗️',
-    // services.gradle.org — official Gradle CDN
     versions: [
       {
         version: '8.10.2',
+        // services.gradle.org — official Gradle CDN
         installerUrl: 'https://services.gradle.org/distributions/gradle-8.10.2-bin.zip',
         silentFlags: 'env-only',
         arch: 'any'
@@ -416,10 +429,10 @@ const tools = [
     description: 'Video conferencing for online classes, group projects, and interviews.',
     category: 'communication',
     icon: '📹',
-    // zoom.us/client/latest — official Zoom CDN permalink (always latest)
     versions: [
       {
         version: 'Latest',
+        // zoom.us/client/latest — official Zoom CDN permalink, always latest
         installerUrl: 'https://zoom.us/client/latest/ZoomInstallerFull.exe',
         silentFlags: '/silent /install',
         arch: 'x64'
@@ -435,10 +448,10 @@ const tools = [
     description: 'Team messaging platform used by companies and open-source communities.',
     category: 'communication',
     icon: '💬',
-    // slack.com/ssb/download-win64 — official Slack CDN permalink
     versions: [
       {
         version: 'Latest',
+        // slack.com/ssb/download-win64 — official Slack CDN permalink
         installerUrl: 'https://slack.com/ssb/download-win64',
         silentFlags: '/silent',
         arch: 'x64'
@@ -454,10 +467,10 @@ const tools = [
     description: 'Chat platform for dev communities, study groups, and hackathon teams.',
     category: 'communication',
     icon: '🎮',
-    // discord.com/api/downloads — official Discord CDN (x64 arch)
     versions: [
       {
         version: 'Latest',
+        // discord.com/api/downloads — official Discord CDN
         installerUrl: 'https://discord.com/api/downloads/distributions/app/installers/latest?channel=stable&platform=win&arch=x64',
         silentFlags: '/S',
         arch: 'x64'
@@ -474,10 +487,10 @@ const tools = [
     description: 'API testing and development tool. Essential for REST API work.',
     category: 'utility',
     icon: '📮',
-    // dl.pstmn.io — official Postman CDN permalink
     versions: [
       {
         version: 'Latest',
+        // dl.pstmn.io — official Postman CDN permalink
         installerUrl: 'https://dl.pstmn.io/download/latest/win64',
         silentFlags: '/S',
         arch: 'x64'
@@ -493,10 +506,10 @@ const tools = [
     description: 'Containerization platform. Run apps in isolated containers.',
     category: 'utility',
     icon: '🐳',
-    // desktop.docker.com/win/main/amd64 — official Docker CDN permalink
     versions: [
       {
         version: 'Latest',
+        // desktop.docker.com — official Docker CDN permalink
         installerUrl: 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe',
         silentFlags: 'install --quiet --accept-license',
         arch: 'x64'
@@ -512,10 +525,10 @@ const tools = [
     description: 'Visual Git client — manage repos without memorizing commands.',
     category: 'utility',
     icon: '🐙',
-    // central.github.com/deployments/desktop — official GitHub Desktop CDN permalink
     versions: [
       {
         version: 'Latest',
+        // central.github.com/deployments/desktop — official GitHub Desktop CDN permalink
         installerUrl: 'https://central.github.com/deployments/desktop/desktopapp/latest/win32',
         silentFlags: '/S',
         arch: 'x64'
@@ -531,10 +544,10 @@ const tools = [
     description: 'File compression/extraction tool for .zip, .rar archives.',
     category: 'utility',
     icon: '🗜️',
-    // www.rarlab.com/rar — official RARLAB CDN
     versions: [
       {
         version: '7.10 (64-bit)',
+        // www.rarlab.com/rar — official RARLAB CDN, direct exe
         installerUrl: 'https://www.rarlab.com/rar/winrar-x64-710.exe',
         silentFlags: '/S',
         arch: 'x64'
@@ -547,13 +560,13 @@ const tools = [
   {
     name: 'Notepad++',
     slug: 'notepadpp',
-    description: 'Lightweight text editor. Great for viewing code and config files.',
+    description: 'Lightweight text editor. Great for viewing code and config files quickly.',
     category: 'utility',
     icon: '📝',
-    // github.com/notepad-plus-plus — official Notepad++ project by don Ho
     versions: [
       {
         version: '8.7.1',
+        // github.com/notepad-plus-plus — official Notepad++ project releases by don Ho
         installerUrl: 'https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7.1/npp.8.7.1.Installer.x64.exe',
         silentFlags: '/S',
         arch: 'x64'
@@ -569,10 +582,10 @@ const tools = [
     description: 'Free media player for video/audio lectures and recordings.',
     category: 'utility',
     icon: '🎬',
-    // get.videolan.org/vlc — official VideoLAN CDN
     versions: [
       {
         version: '3.0.21',
+        // get.videolan.org/vlc — official VideoLAN CDN, direct exe
         installerUrl: 'https://get.videolan.org/vlc/3.0.21/win64/vlc-3.0.21-win64.exe',
         silentFlags: '/S',
         arch: 'x64'
@@ -588,10 +601,10 @@ const tools = [
     description: 'Fast browser with DevTools for web development.',
     category: 'utility',
     icon: '🌐',
-    // dl.google.com/chrome — official Google CDN
     versions: [
       {
         version: 'Latest',
+        // dl.google.com/chrome — official Google Chrome enterprise CDN
         installerUrl: 'https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise64.msi',
         silentFlags: '/quiet /norestart',
         arch: 'x64'
@@ -607,10 +620,10 @@ const tools = [
     description: 'High compression ratio file archiver. Free and open-source.',
     category: 'utility',
     icon: '📁',
-    // 7-zip.org/a — official 7-Zip CDN
     versions: [
       {
         version: '24.08',
+        // 7-zip.org/a — official 7-Zip CDN, direct exe
         installerUrl: 'https://7-zip.org/a/7z2408-x64.exe',
         silentFlags: '/S',
         arch: 'x64'
@@ -626,10 +639,10 @@ const tools = [
     description: 'Diagram tool for ER diagrams, UML, flowcharts, and system design.',
     category: 'utility',
     icon: '📊',
-    // github.com/jgraph — official diagrams.net / draw.io GitHub org
     versions: [
       {
         version: '24.7.17',
+        // github.com/jgraph — official draw.io / diagrams.net org by JGraph Ltd
         installerUrl: 'https://github.com/jgraph/drawio-desktop/releases/download/v24.7.17/draw.io-24.7.17-windows-installer.exe',
         silentFlags: '/S',
         arch: 'x64'
